@@ -1,210 +1,277 @@
 <!DOCTYPE html>
 <html lang="zh-hans">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SandBox · YeungFanStudio.com</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/lib/codemirror.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/hint/show-hint.css"
-    integrity="sha256-9PjI1IwVXcv44E37KbDVAJdEYNCCBK3+Ddo757s6L8g=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/theme/3024-day.css"
-    integrity="sha256-fJEmodiji+cKbZaHL4rwMhUgPzxllZdTFMxPdfeSuPg=" crossorigin="anonymous">
-  <style>
-    body {
-      margin: 0 auto;
-      padding: 32px 24px;
-      box-sizing: border-box;
-      display: grid;
-      grid-template-areas: 'header header''js-title console-title''editor console';
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 24px;
-      grid-template-rows: 40px 32px auto;
-      min-height: 100vh;
-      max-width: 1200px;
-    }
-
-    @media (max-width: 800px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SandBox · YeungFanStudio.com</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/lib/codemirror.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/hint/show-hint.css"
+      integrity="sha256-9PjI1IwVXcv44E37KbDVAJdEYNCCBK3+Ddo757s6L8g="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/theme/3024-day.css"
+      integrity="sha256-fJEmodiji+cKbZaHL4rwMhUgPzxllZdTFMxPdfeSuPg="
+      crossorigin="anonymous"
+    />
+    <style>
       body {
-        padding: 0 24px;
-        grid-template-areas: 'header''js-title''editor''console-title''console';
-        grid-template-columns: 1fr;
-        grid-template-rows: 40px 32px 1fr 32px 1fr;
-
+        margin: 0 auto;
+        padding: 32px 24px;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-areas: 'header header' 'js-title console-title' 'editor console';
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 24px;
+        grid-template-rows: 40px 32px auto;
+        min-height: 100vh;
+        max-width: 1200px;
       }
-    }
 
-    header {
-      grid-area: header;
-      align-self: flex-end;
-      color: #2a2a2a;
-      font-size: 20px;
-      font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      font-weight: 800;
-    }
-
-    header>span {
-      color: rgba(0, 140, 255, 0.863);
-    }
-
-    .editor-title {
-      grid-area: js-title;
-    }
-
-    .console-title {
-      grid-area: console-title;
-    }
-
-    .editor-title,
-    .console-title {
-      font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      font-weight: 800;
-      margin: 12px 0 0 0;
-      color: #9a9a9a;
-    }
-
-    #js-editor {
-      display: none;
-    }
-
-    .CodeMirror {
-      grid-area: editor;
-      height: unset;
-    }
-
-    .console {
-      grid-area: console;
-      font-family: monospace;
-    }
-
-    .error-log {
-      color: rgb(221, 92, 59);
-    }
-
-    .warn-log {
-      color: rgba(255, 174, 0, 0.692);
-    }
-  </style>
-</head>
-
-<body>
-  <header>
-    SandBox · <span> JavaScript execution </span>
-  </header>
-  <h3 class="editor-title">JavaScript</h3>
-  <textarea name="js-editor" id="js-editor"></textarea>
-  <h3 class="console-title">console</h3>
-  <div class="console"></div>
-</body>
-
-
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/lib/codemirror.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/mode/javascript/javascript.js"
-  integrity="sha256-dY+W3GOt4MpAsoCz2NW2IrKk5LMSwKmW0ElpiXZxmVU=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/hint/show-hint.js"
-  integrity="sha256-wK1Xn+2XGpWU4MlrbANXcrfCXB9HGz09i5IBgaiudn4=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/hint/javascript-hint.js"
-  integrity="sha256-BQ3RbRmG7kuAmpvTtD22O3yeWms8T0DTbpNANQxXIak=" crossorigin="anonymous"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/edit/matchbrackets.js"
-  integrity="sha256-K7D6LI9nbO/+XqhfEDHcvOL0kIxYNfzn8aFynPOqDHY=" crossorigin="anonymous"></script> -->
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/edit/closebrackets.js"
-  integrity="sha256-J+IeaQd1P4WqdI6BNbLIiQ8QuzlexywhSmLrFd4H2g0=" crossorigin="anonymous"></script>
-
-
-<script>
-  let sandboxMode = false
-  let consoleContent = []
-
-  function overwriteLog({
-    originFunction,
-    isError = false,
-    isWarn = false
-  }) {
-    return function () {
-      try {
-        if (sandboxMode) {
-          [...arguments].forEach(item => {
-            consoleContent.push({
-              isError,
-              isWarn,
-              statement: item
-            })
-          })
-        } else {
-          originFunction.call(console, ...arguments);
+      @media (max-width: 800px) {
+        body {
+          padding: 0 24px;
+          grid-template-areas: 'header' 'js-title' 'editor' 'console-title' 'console';
+          grid-template-columns: 1fr;
+          grid-template-rows: 40px 32px 1fr 32px 1fr;
         }
-      } catch (e) {
-        console.error('console.log error', e);
+      }
+
+      header {
+        grid-area: header;
+        align-self: flex-end;
+        color: #2a2a2a;
+        font-size: 20px;
+        font-family: 'SF Pro Display', 'SF Pro Text', -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          'Open Sans', 'Helvetica Neue', sans-serif;
+        font-weight: 800;
+      }
+
+      header > span {
+        color: rgba(0, 140, 255, 0.863);
+      }
+
+      .editor-title {
+        grid-area: js-title;
+      }
+
+      .console-title {
+        grid-area: console-title;
+      }
+
+      .editor-title,
+      .console-title {
+        font-family: 'SF Pro Display', 'SF Pro Text', -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          'Open Sans', 'Helvetica Neue', sans-serif;
+        font-weight: 800;
+        margin: 12px 0 0 0;
+        color: #9a9a9a;
+      }
+
+      #js-editor {
+        display: none;
+      }
+
+      .CodeMirror {
+        grid-area: editor;
+        height: unset;
+      }
+
+      .console {
+        grid-area: console;
+        font-family: monospace;
+      }
+
+      .error-log {
+        color: rgb(221, 92, 59);
+      }
+
+      .warn-log {
+        color: rgba(255, 174, 0, 0.692);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>SandBox · <span> JavaScript execution </span></header>
+    <h3 class="editor-title">JavaScript</h3>
+    <textarea name="js-editor" id="js-editor"></textarea>
+    <h3 class="console-title">console</h3>
+    <div class="console"></div>
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/lib/codemirror.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/mode/javascript/javascript.js"
+    integrity="sha256-dY+W3GOt4MpAsoCz2NW2IrKk5LMSwKmW0ElpiXZxmVU="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/hint/show-hint.js"
+    integrity="sha256-wK1Xn+2XGpWU4MlrbANXcrfCXB9HGz09i5IBgaiudn4="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/hint/javascript-hint.js"
+    integrity="sha256-BQ3RbRmG7kuAmpvTtD22O3yeWms8T0DTbpNANQxXIak="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/edit/matchbrackets.js"
+    integrity="sha256-K7D6LI9nbO/+XqhfEDHcvOL0kIxYNfzn8aFynPOqDHY="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/codemirror@5.54.0/addon/edit/closebrackets.js"
+    integrity="sha256-J+IeaQd1P4WqdI6BNbLIiQ8QuzlexywhSmLrFd4H2g0="
+    crossorigin="anonymous"
+  ></script>
+
+  <script>
+    const generateIndent = (indent) =>
+      [...Array(indent)].map((_) => '&nbsp;').join('')
+
+    let sandboxMode = false
+    let consoleContent = []
+
+    function overwriteLog({ originFunction, isError = false, isWarn = false }) {
+      return function () {
+        try {
+          if (sandboxMode) {
+            ;[...arguments].forEach((item) => {
+              consoleContent.push({
+                isError,
+                isWarn,
+                statement: item,
+              })
+            })
+          } else {
+            originFunction.call(console, ...arguments)
+          }
+        } catch (e) {
+          console.error('console.log error', e)
+        }
       }
     }
-  }
 
-  console.log = overwriteLog({
-    originFunction: console.log
-  })
-  console.error = overwriteLog({
-    originFunction: console.error,
-    isError: true
-  })
-  console.warn = overwriteLog({
-    originFunction: console.warn,
-    isWarn: true
-  })
-
-  const jsTextarea = document.querySelector('#js-editor')
-  var editor = CodeMirror.fromTextArea(jsTextarea, {
-    mode: 'javascript',
-    tabSize: 2,
-    lineWrapping: true,
-    autofocus: true,
-    // matchBrackets: true,
-    autoCloseBrackets: true,
-  })
-  editor.setValue(`console.log({x: 1, y: 2})`)
-
-  const handleChange = () => {
-    sandboxMode = true
-    const consoleElement = document.querySelector('.console')
-
-    consoleContent = []
-    consoleElement.innerHTML = ''
-    try {
-      eval(editor.getValue())
-    } catch (e) {
-      consoleContent.push({
-        isError: true,
-        statement: `An error occurred during execution: <br>${e}<br><br>Wating for change...`
-      })
-    }
-
-    consoleContent.forEach(item => {
-      const element = document.createElement('div')
-      if (item.isError) {
-        element.classList.add('error-log')
-      } else if (item.isWarn) {
-        element.classList.add('warn-log')
-      }
-      if (item.statement instanceof Array) {
-        element.innerHTML = `[ ${item.statement} ]`
-      } else if (item.statement instanceof Object) {
-        let innerHtml = '{ '
-        Object.keys(item.statement).forEach((key, index) => {
-          innerHtml +=
-            `${key}: ${item.statement[key]}${index === Object.keys(item.statement).length - 1 ? '' : ', '}`
-        })
-        innerHtml += ' }'
-        element.innerHTML = innerHtml
-      } else {
-        element.innerHTML = item.statement
-      }
-      consoleElement.append(element)
+    console.log = overwriteLog({
+      originFunction: console.log,
+    })
+    console.error = overwriteLog({
+      originFunction: console.error,
+      isError: true,
+    })
+    console.warn = overwriteLog({
+      originFunction: console.warn,
+      isWarn: true,
     })
 
-    sandboxMode = false
-  }
+    const jsTextarea = document.querySelector('#js-editor')
+    var editor = CodeMirror.fromTextArea(jsTextarea, {
+      mode: 'javascript',
+      tabSize: 2,
+      lineWrapping: true,
+      autofocus: true,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+    })
+    editor.setValue(`console.log({x: 1, y: 2})`)
 
-  handleChange()
-  editor.on('change', handleChange)
-</script>
+    const handleChange = () => {
+      sandboxMode = true
+      const consoleElement = document.querySelector('.console')
 
+      consoleContent = []
+      consoleElement.innerHTML = ''
+      try {
+        eval(editor.getValue())
+      } catch (e) {
+        consoleContent.push({
+          isError: true,
+          statement: `An error occurred during execution: <br>${e}<br><br>Wating for change...`,
+        })
+      }
+
+      consoleContent.forEach((item) => {
+        const element = document.createElement('div')
+        if (item.isError) {
+          element.classList.add('error-log')
+        } else if (item.isWarn) {
+          element.classList.add('warn-log')
+        }
+        if (item.statement instanceof Array) {
+          element.innerHTML = transformArrayToHtml({ arr: item.statement })
+        } else if (item.statement instanceof Object) {
+          element.innerHTML = transformObjectToHtml({ obj: item.statement })
+        } else {
+          element.innerHTML = item.statement
+        }
+        consoleElement.append(element)
+      })
+
+      sandboxMode = false
+    }
+
+    handleChange()
+    editor.on('change', handleChange)
+
+    function transformObjectToHtml({ obj, indent = 2 }) {
+      if (!obj instanceof Object) {
+        return 'Not an Object. '
+      }
+
+      return `${obj}<br>${Object.keys(obj)
+        .map((key) => {
+          const value = obj[key]
+          if (value instanceof Array) {
+            return `${generateIndent(indent)}${key}: ${transformArrayToHtml({
+              arr: value,
+              indent: indent + 2,
+            })}`
+          } else if (value instanceof Object) {
+            return `${generateIndent(indent)}${key}: ${transformObjectToHtml({
+              obj: value,
+              indent: indent + 2,
+            })}`
+          } else {
+            return `${generateIndent(indent)}${key}: ${value}`
+          }
+        })
+        .join(', <br>')}`
+    }
+
+    function transformArrayToHtml({ arr, indent = 2 }) {
+      if (!arr instanceof Array) {
+        return 'Not an Array. '
+      }
+
+      return `(${arr.length}) [ ${arr.join(', ')} ]<br>${arr
+        .map((value, index) => {
+          if (value instanceof Array) {
+            return `${generateIndent(
+              indent + 2
+            )}${index}: ${transformArrayToHtml({
+              arr: value,
+              indent: indent + 2,
+            })}`
+          } else if (value instanceof Object) {
+            return `${generateIndent(indent)}${index}: ${transformObjectToHtml({
+              obj: value,
+              indent: indent + 2,
+            })}`
+          } else {
+            return `${generateIndent(indent)}${index}: ${value}`
+          }
+        })
+        .join(', <br>')}`
+    }
+  </script>
 </html>
